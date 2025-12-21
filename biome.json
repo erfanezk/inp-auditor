@@ -20,8 +20,14 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true
+      "recommended": true,
+      "organizeImports": {
+        "enabled": true
+      }
     }
+  },
+  "organizeImports": {
+    "enabled": true
   },
   "javascript": {
     "formatter": {
