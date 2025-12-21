@@ -1,0 +1,54 @@
+---
+alwaysApply: true
+---
+Frontend Performance Auditor MCP – AI-Optimized Description
+
+Project Name: Frontend Performance Auditor MCP
+
+Purpose:
+Statically analyze frontend TypeScript/React code to detect performance anti-patterns in changed Git files, providing actionable, human-readable feedback before merging code.
+
+Scope (MVP):
+
+Detect INP risks: heavy loops inside event handlers (onClick, onChange, etc.)
+
+Detect MEMORY risks: event listeners or intervals in useEffect without cleanup
+
+Analyze only changed .ts/.tsx files via Git diff (e.g., main..HEAD)
+
+Output Markdown reports with severity, file, line, explanation, and fix suggestion
+
+Optional exit code 1 on high-severity issues for CI/merge-blocking
+
+Core Workflow:
+
+Git Diff Analysis: Extract changed files between two refs
+
+AST Parsing: Use TypeScript Compiler API to parse files into AST
+
+Rule Engine: Apply detection rules to AST nodes
+
+Report Generation: Format findings in Markdown for CI, merge request comments, or console
+
+CLI Example:
+
+perf-mcp analyze --diff main..HEAD
+
+
+Key Features for Cursor AI Understanding:
+
+Rule-Based: Each rule has metric (INP or MEMORY), severity, explanation, and fix
+
+Git-Aware: Operates purely via Git; platform-agnostic
+
+Extensible: Easy to add new performance rules or metrics
+
+Human-Friendly Output: Markdown with clear explanation per issue
+
+Why It Matters:
+
+Prevents frontend performance regressions before merge
+
+Provides clear developer guidance automatically
+
+Demonstrates AST-level static analysis + Git workflow integration
