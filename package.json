@@ -4,6 +4,9 @@
   "description": "",
   "type": "module",
   "main": "build/server.js",
+  "bin": {
+    "fpa": "./build/cli/index.js"
+  },
   "files": [
     "build"
   ],
