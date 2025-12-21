@@ -70,6 +70,44 @@ function findLoopsInNode(node: ts.Node): ts.Node[] {
   return loops;
 }
 
+function findFunctionDefinition(
+  identifier: ts.Identifier,
+  sourceFile: ts.SourceFile
+): ts.Node | null {
+  const identifierName = identifier.getText(sourceFile);
+  let foundDefinition: ts.Node | null = null;
+
+  function visit(node: ts.Node) {
+    // Variable declaration: const handleClick = () => { ... }
+    if (ts.isVariableDeclaration(node)) {
+      if (
+        ts.isIdentifier(node.name) &&
+        node.name.getText(sourceFile) === identifierName &&
+        node.initializer
+      ) {
+        // Check if initializer is a function expression or arrow function
+        if (ts.isArrowFunction(node.initializer) || ts.isFunctionExpression(node.initializer)) {
+          foundDefinition = node.initializer;
+          return;
+        }
+      }
+    }
+
+    // Function declaration: function handleClick() { ... }
+    if (ts.isFunctionDeclaration(node)) {
+      if (node.name && node.name.getText(sourceFile) === identifierName) {
+        foundDefinition = node;
+        return;
+      }
+    }
+
+    ts.forEachChild(node, visit);
+  }
+
+  visit(sourceFile);
+  return foundDefinition;
+}
+
 function findEventHandlers(sourceFile: ts.SourceFile): ts.Node[] {
   const handlers: ts.Node[] = [];
 
@@ -77,14 +115,39 @@ function findEventHandlers(sourceFile: ts.SourceFile): ts.Node[] {
     if (ts.isJsxAttribute(node)) {
       const name = node.name.getText(sourceFile);
       if (isEventHandler(name) && node.initializer) {
-        handlers.push(node.initializer);
+        // Handle JSXExpressionContainer: onClick={handleClick} or onClick={() => {}}
+        if (ts.isJsxExpression(node.initializer) && node.initializer.expression) {
+          const expr = node.initializer.expression;
+
+          // If it's an arrow function or function expression directly
+          if (ts.isArrowFunction(expr) || ts.isFunctionExpression(expr)) {
+            handlers.push(expr);
+          }
+          // If it's an identifier, find the function definition
+          else if (ts.isIdentifier(expr)) {
+            const definition = findFunctionDefinition(expr, sourceFile);
+            if (definition) {
+              handlers.push(definition);
+            }
+          }
+        }
       }
     }
 
     if (ts.isPropertyAssignment(node)) {
       const name = node.name.getText(sourceFile);
-      if (isEventHandler(name)) {
-        handlers.push(node.initializer);
+      if (isEventHandler(name) && node.initializer) {
+        // If it's an arrow function or function expression directly
+        if (ts.isArrowFunction(node.initializer) || ts.isFunctionExpression(node.initializer)) {
+          handlers.push(node.initializer);
+        }
+        // If it's an identifier, find the function definition
+        else if (ts.isIdentifier(node.initializer)) {
+          const definition = findFunctionDefinition(node.initializer, sourceFile);
+          if (definition) {
+            handlers.push(definition);
+          }
+        }
       }
     }
 
@@ -108,7 +171,20 @@ export const inpHeavyLoopsRule: Rule = {
     const eventHandlers = findEventHandlers(sourceFile);
 
     for (const handler of eventHandlers) {
-      const loops = findLoopsInNode(handler);
+      // Get the body of the function to check
+      let bodyToCheck: ts.Node | null = null;
+
+      if (ts.isArrowFunction(handler)) {
+        bodyToCheck = handler.body || null;
+      } else if (ts.isFunctionExpression(handler) || ts.isFunctionDeclaration(handler)) {
+        bodyToCheck = handler.body || null;
+      } else {
+        bodyToCheck = handler;
+      }
+
+      if (!bodyToCheck) continue;
+
+      const loops = findLoopsInNode(bodyToCheck);
 
       for (const loop of loops) {
         const iterations = ts.isForStatement(loop) ? countLoopIterations(loop) : 0;
