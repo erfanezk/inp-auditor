@@ -64,13 +64,3 @@ export function getCallExpressionName(node: ts.Node, sourceFile: ts.SourceFile):
 export function matchesPattern(name: string, patterns: readonly string[]): boolean {
   return patterns.some((pattern) => name.includes(pattern));
 }
-
-export function isLoop(node: ts.Node): boolean {
-  return (
-    ts.isForStatement(node) ||
-    ts.isForInStatement(node) ||
-    ts.isForOfStatement(node) ||
-    ts.isWhileStatement(node) ||
-    ts.isDoStatement(node)
-  );
-}
