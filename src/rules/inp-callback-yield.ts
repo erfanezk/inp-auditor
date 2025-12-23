@@ -6,7 +6,8 @@ import { YIELDING_MECHANISMS } from "@/constants/yielding";
 import type { PerformanceIssue, Rule } from "@/types";
 import { PerformanceMetric, RuleName, Severity } from "@/types";
 import { findEventHandlers } from "@/utils/event-handler";
-import { getCallExpressionName, getFunctionBody, isLoop, matchesPattern } from "@/utils/functions";
+import { getCallExpressionName, getFunctionBody, matchesPattern } from "@/utils/functions";
+import { isInsideLoop } from "@/utils/loop";
 
 const MAX_STATE_UPDATES = 2;
 
@@ -16,17 +17,6 @@ interface HandlerPatterns {
   stateUpdateCount: number;
   hasHeavyComputation: boolean;
   hasYielding: boolean;
-}
-
-function isInsideLoop(node: ts.Node): boolean {
-  let parent = node.parent;
-  while (parent) {
-    if (isLoop(parent)) {
-      return true;
-    }
-    parent = parent.parent;
-  }
-  return false;
 }
 
 function detectPatterns(body: ts.Node, sourceFile: ts.SourceFile): HandlerPatterns {
@@ -52,7 +42,7 @@ function detectPatterns(body: ts.Node, sourceFile: ts.SourceFile): HandlerPatter
         patterns.stateUpdateCount++;
       }
       // Only flag array operations if they're NOT inside a loop
-      // (loops are already covered by inp-heavy-loop rule)
+      // (array operations in loops are less problematic than standalone heavy operations)
       if ((HEAVY_ARRAY_OPS as readonly string[]).includes(callName) && !isInsideLoop(node)) {
         patterns.hasHeavyComputation = true;
       }
