@@ -36,7 +36,6 @@ export async function analyze(
         },
         byMetric: {
           [PerformanceMetric.Inp]: 0,
-          [PerformanceMetric.Memory]: 0,
         },
         filesAnalyzed: 0,
       },
@@ -62,8 +61,6 @@ export async function analyze(
     },
     byMetric: {
       [PerformanceMetric.Inp]: allIssues.filter((i) => i.metric === PerformanceMetric.Inp).length,
-      [PerformanceMetric.Memory]: allIssues.filter((i) => i.metric === PerformanceMetric.Memory)
-        .length,
     },
     filesAnalyzed: sourceFiles.size,
   };

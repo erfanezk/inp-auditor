@@ -2,7 +2,6 @@ import type { SourceFile } from "typescript";
 
 export enum PerformanceMetric {
   Inp = "INP",
-  Memory = "MEMORY",
 }
 
 export enum Severity {

@@ -43,7 +43,7 @@ async function createMarkdownDocument(markdown: string): Promise<string> {
 
     // Generate filename with timestamp
     const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, -5);
-    const filename = `performance-audit-${timestamp}.md`;
+    const filename = `inp-audit-${timestamp}.md`;
     const filePath = join(resultsDir, filename);
 
     // Ensure markdown ends with a newline
@@ -62,10 +62,10 @@ async function createMarkdownDocument(markdown: string): Promise<string> {
 
 function printHelp(): void {
   console.log(`
-Frontend Performance Auditor
+INP Auditor
 
 Usage:
-  fpa analyze [options]
+  inp-audit analyze [options]
 
 Options:
   --diff <spec>          Git diff specification (e.g., "main..HEAD")
@@ -75,9 +75,9 @@ Options:
   --version, -v          Show version number
 
 Examples:
-  fpa analyze --diff main..HEAD
-  fpa analyze --files src/App.tsx,src/Button.tsx
-  fpa analyze --diff HEAD~1..HEAD --fail-on-high
+  inp-audit analyze --diff main..HEAD
+  inp-audit analyze --files src/App.tsx,src/Button.tsx
+  inp-audit analyze --diff HEAD~1..HEAD --fail-on-high
 `);
 }
 
@@ -95,7 +95,7 @@ async function main(): Promise<void> {
     const markdown = generateMarkdownReport(result);
     const filePath = await createMarkdownDocument(markdown);
 
-    console.log(`\n✅ Performance audit completed!`);
+    console.log(`\n✅ INP audit completed!`);
     console.log(`📄 Report saved to: ${filePath}\n`);
 
     if (options.failOnHighSeverity && result.summary.bySeverity[Severity.High] > 0) {

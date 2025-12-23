@@ -16,8 +16,6 @@ function getMetricIcon(metric: PerformanceMetric): string {
   switch (metric) {
     case PM.Inp:
       return "⚡";
-    case PM.Memory:
-      return "💾";
   }
 }
 
@@ -59,13 +57,13 @@ function formatIssue(issue: PerformanceIssue, index: number): string {
 }
 
 export function generateMarkdownReport(result: AnalysisResult): string {
-  let markdown = "# Performance Audit Report\n\n";
+  let markdown = "# INP Audit Report\n\n";
 
   // Compact summary
   const { total, filesAnalyzed, bySeverity, byMetric } = result.summary;
   markdown += `${total} issue${total !== 1 ? "s" : ""} found in ${filesAnalyzed} file${filesAnalyzed !== 1 ? "s" : ""}\n\n`;
   markdown += `**Severity:** 🔴 ${bySeverity[S.High]} high  |  🟡 ${bySeverity[S.Medium]} medium  |  🟢 ${bySeverity[S.Low]} low  \n`;
-  markdown += `**Metrics:** ⚡ ${byMetric[PM.Inp]} INP  |  💾 ${byMetric[PM.Memory]} Memory\n\n`;
+  markdown += `**Metric:** ⚡ ${byMetric[PM.Inp]} INP\n\n`;
 
   if (result.issues.length === 0) {
     markdown += "✅ No performance issues found!\n";
