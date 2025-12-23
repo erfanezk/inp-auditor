@@ -4,7 +4,7 @@ import { useState } from "react";
 // Example 1: Simple event handler with no heavy work
 export function GoodSimpleButton() {
   const handleClick = () => {
-    // This is fine - no heavy loops or work
+    // This is fine - no heavy computations or blocking operations
     console.log("Button clicked");
   };
 
@@ -148,13 +148,13 @@ export function GoodStateUpdatePattern() {
   );
 }
 
-// Example 6: Array operations inside loops are fine (covered by loop rule)
+// Example 6: Array operations inside small loops are acceptable
 export function GoodArrayInLoop() {
   const handleClick = () => {
     const items = Array.from({ length: 100 }, (_, i) => i);
 
     // Array operations inside a small loop are acceptable
-    // (This won't trigger callback-yield rule because it's in a loop)
+    // (Small loops with array operations are less problematic than standalone heavy operations)
     for (let i = 0; i < 10; i++) {
       const mapped = items.map((item) => item * i);
       const filtered = mapped.filter((item) => item > 5);
