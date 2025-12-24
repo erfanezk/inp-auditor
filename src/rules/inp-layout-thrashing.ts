@@ -16,6 +16,7 @@ import { PerformanceMetric, RuleName, Severity } from "@/types";
 import { findEventHandlers } from "@/utils/event-handler";
 import { getCallExpressionName, getFunctionBody } from "@/utils/functions";
 import { isLoop } from "@/utils/loop";
+import { hasYieldingMechanism } from "@/utils/yielding";
 
 interface LayoutOperation {
   node: ts.Node;
@@ -125,16 +126,20 @@ function isInsideLoop(node: ts.Node): boolean {
 }
 
 function isInsideYieldingMechanism(node: ts.Node, sourceFile: ts.SourceFile): boolean {
+  // Use shared utility for better context awareness
+  // Specifically check if node is inside requestAnimationFrame (deferred reads are OK)
   let parent = node.parent;
-  while (parent) {
-    const callName = getCallExpressionName(parent, sourceFile);
-    if (
-      callName &&
-      ["setTimeout", "requestAnimationFrame", "requestIdleCallback", "queueMicrotask"].includes(
-        callName
-      )
-    ) {
-      return true;
+  while (parent && !ts.isSourceFile(parent)) {
+    if (ts.isCallExpression(parent)) {
+      const callName = getCallExpressionName(parent, sourceFile);
+      // requestAnimationFrame is especially important - deferred layout reads are OK
+      if (callName === "requestAnimationFrame" || callName === "requestIdleCallback") {
+        return true;
+      }
+      // Also check other yielding mechanisms
+      if (hasYieldingMechanism(parent, sourceFile, false)) {
+        return true;
+      }
     }
     parent = parent.parent;
   }

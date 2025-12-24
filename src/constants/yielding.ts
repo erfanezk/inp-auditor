@@ -3,4 +3,6 @@ export const YIELDING_MECHANISMS = [
   "requestAnimationFrame",
   "requestIdleCallback",
   "queueMicrotask",
-];
+  "scheduler.yield",
+  "yield",
+] as const;

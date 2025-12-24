@@ -64,3 +64,21 @@ export function getCallExpressionName(node: ts.Node, sourceFile: ts.SourceFile):
 export function matchesPattern(name: string, patterns: readonly string[]): boolean {
   return patterns.some((pattern) => name.includes(pattern));
 }
+
+export function findFunctions(sourceFile: ts.SourceFile): ts.Node[] {
+  const functions: ts.Node[] = [];
+
+  function visit(node: ts.Node) {
+    if (
+      ts.isFunctionDeclaration(node) ||
+      ts.isFunctionExpression(node) ||
+      ts.isArrowFunction(node)
+    ) {
+      functions.push(node);
+    }
+    ts.forEachChild(node, visit);
+  }
+
+  visit(sourceFile);
+  return functions;
+}
