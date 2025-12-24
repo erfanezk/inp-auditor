@@ -1,11 +1,11 @@
 {
-  "name": "inp-auditor",
+  "name": "react-inp-auditor",
   "version": "1.0.0",
-  "description": "Static analyzer for detecting INP (Interaction to Next Paint) performance issues in TypeScript/React code",
+  "description": "React-focused static analyzer for detecting INP (Interaction to Next Paint) performance issues in TypeScript/React code",
   "type": "module",
   "main": "build/server.js",
   "bin": {
-    "inp-audit": "./build/cli/index.js"
+    "react-inp-audit": "./build/cli/index.js"
   },
   "files": [
     "build"
