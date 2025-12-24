@@ -13,6 +13,7 @@ export enum Severity {
 export enum RuleName {
   InpCallbackYield = "inp-callback-yield",
   InpLayoutThrashing = "inp-layout-thrashing",
+  InpDomSize = "inp-dom-size",
 }
 
 export interface PerformanceIssue {
